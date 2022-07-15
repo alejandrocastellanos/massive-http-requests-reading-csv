@@ -16,6 +16,7 @@ function App() {
     const [data, setData] = useState([]);
     const [url, setUrl] = useState('');
     const [variables, setVariables] = useState([]);
+    const [fileName, setFileName] = useState('');
 
     useEffect(() => {
         setData([]);
@@ -23,6 +24,7 @@ function App() {
     }, []);
 
     const changeHandler = (event) => {
+        setFileName(event.target.files[0].name);
         Papa.parse(event.target.files[0], {
             header: true,
             skipEmptyLines: true,
@@ -45,11 +47,8 @@ function App() {
     });
 
     const SendRequest = () => {
-        variables.map((value) => {
-            console.log(value)
-        })
+        console.log(data);
     }
-
 
     return (
         <>
@@ -70,7 +69,7 @@ function App() {
                                 textAlign: "center"
                             }}
                             >
-                                <Box  mb={3}>
+                                <Box mb={1}>
                                     <label htmlFor="upload-photo">
                                         <input
                                             style={{ display: 'none' }}
@@ -83,6 +82,9 @@ function App() {
                                             Upload CSV
                                         </Button>
                                     </label>
+                                </Box>
+                                <Box sx={{ color: "green" }} mb={3}>
+                                    {fileName}
                                 </Box>
                                 <Box  mb={3}>
                                     <TextField
@@ -101,11 +103,17 @@ function App() {
                                             <TableBody>
                                                 <TableRow>
                                                     <TableCell component="th" scope="row">
-                                                        <b>URL</b>
+                                                        <b>File name</b>
+                                                    </TableCell>
+                                                    <TableCell align="right">{fileName}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell component="th" scope="row">
+                                                        <b>Url</b>
                                                     </TableCell>
                                                     <TableCell align="right">{url}</TableCell>
                                                 </TableRow>
-                                                {
+                                                { variables ?
                                                     variables.map((value) => {
                                                         return(
                                                             <TableRow>
@@ -115,7 +123,7 @@ function App() {
                                                                 <TableCell align="right">{value}</TableCell>
                                                             </TableRow>
                                                         )
-                                                    })
+                                                    }) : <></>
                                                 }
                                             </TableBody>
                                         </Table>

@@ -2,12 +2,11 @@
 
 App to send batch messages to a specific api POST reading csv.
 
-[Link App](https://alejandrocastellanos.github.io/massive-http-requests-reading-csv/)
-
-![Form](form.png "App Form")
-![Table](table.png "App Table")
+[Link App Github pages](https://alejandrocastellanos.github.io/massive-http-requests-reading-csv/)
 
 # Images
+![Form](form.png "App Form")
+![Table](table.png "App Table")
 
 
 # Getting Started with Create React App

@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Papa from 'papaparse';
+import {CSVLink} from 'react-csv';
+import DownloadIcon from '@mui/icons-material/Download';
 
 import {
     Alert,
@@ -20,7 +22,8 @@ function App() {
     const [variables, setVariables] = useState([]);
     const [fileName, setFileName] = useState('');
     const [error, setError] = useState();
-    const [success, setSuccess] = useState();
+    const [success, setSuccess] = useState(false);
+    const [sending, setSending] = useState(false);
 
     useEffect(() => {
         setData([]);
@@ -31,6 +34,7 @@ function App() {
         if (event.target.files[0].type !== 'text/csv'){
             setError('Formato de archivo no valido.')
         }else{
+            setSending(false);
             setFileName(event.target.files[0].name);
             Papa.parse(event.target.files[0], {
                 header: true,
@@ -56,10 +60,10 @@ function App() {
     });
 
     const SendRequest = (e) => {
+        setSending(true);
         e.preventDefault();
-        let newData = []
+        let newData = [];
         data.forEach(function (values){
-            console.log(JSON.stringify(values))
             fetch(url, {
                 method: "POST",
                 headers: new Headers({
@@ -69,15 +73,28 @@ function App() {
                 body: JSON.stringify(values)
             })
                 .then(response => {
-                    console.log('message sent.', response)
                     values['Result'] = 'sent';
-                    newData.push(values)
+                    newData.push(values);
                     setData(newData);
                 })
                 .catch(error => {
-                    console.log('error: ', error)
+                    console.log('error: ', error);
+                    values['Result'] = 'error';
+                    newData.push(values);
+                    setData(newData);
                 });
         });
+        setSuccess(true);
+    }
+
+    function TableItems(props){
+        if(props.emp.Result === 'sent'){
+            return <TableCell align="center" sx={{ color: "green" }}>{props.emp[props.header]}</TableCell>;
+        }else if(props.emp.Result === 'error'){
+            return <TableCell align="center" sx={{ color: "red" }}>{props.emp[props.header]}</TableCell>
+        }else{
+            return <TableCell align="center">{props.emp[props.header]}</TableCell>
+        }
     }
 
     return (
@@ -130,17 +147,17 @@ function App() {
                                 <Box sx={{ color: "green" }} mb={3}>
                                     {fileName}
                                 </Box>
-                                <Box  mb={3}>
+                                <Box  mb={5}>
                                     <TextField
                                         color="secondary"
                                         id="outlined-required"
                                         label="URL"
-                                        size="small"
+                                        sx={{ width: 350, height: 20 }}
                                         onChange={e => setUrl(e.target.value)}
                                     />
                                 </Box>
                                 <Box  mb={3}>
-                                    <Button variant="contained" color="primary" onClick={SendRequest}>Send</Button>
+                                    <Button variant="contained" color="primary" onClick={SendRequest} disabled={sending}>Send</Button>
                                 </Box>
                                 <Box sx={{width: "70%", marginLeft: "15%"}}>
                                     <TableContainer component={Paper}>
@@ -177,15 +194,36 @@ function App() {
                                 <Snackbar
                                     open={true}
                                     autoHideDuration={2000}
-                                    message="Mobile phone must start with +57"
+                                    message="Mobile phone must start with 57"
                                 />
                                 {
-                                    success && <Alert variant="filled" sx={{ marginTop: 5, marginLeft: 2 }} severity="success">{success}</Alert>
+                                    success && <Alert variant="filled" sx={{ marginTop: 5, marginLeft: 20, marginRight: 20 }} severity="success">Messages sent successfully</Alert>
                                 }
                                 {
-                                    error && <Alert variant="filled" sx={{ marginTop: 5, marginLeft: 2 }} severity="error">{error}</Alert>
+                                    error && <Alert variant="filled" sx={{ marginTop: 5, marginLeft: 20, marginRight: 20 }} severity="error">Error sending messages. please contact the administrator</Alert>
                                 }
-
+                                {
+                                    success &&
+                                    <Box m={5}
+                                                    display="flex"
+                                                    justifyContent="flex-end"
+                                                    alignItems="flex-end"
+                                    >
+                                        <Button
+                                            startIcon={<DownloadIcon />}
+                                            variant="contained"
+                                            color="success"
+                                        >
+                                            <CSVLink
+                                                data={data}
+                                                filename="send_result.csv"
+                                                style={{ color: "white", textDecoration: "none" }}
+                                            >
+                                                Download Results
+                                            </CSVLink>
+                                        </Button>
+                                    </Box>
+                                }
                             </Box>
                         </Grid>
 
@@ -228,7 +266,9 @@ function App() {
                                             {data.map((emp, index) => (
                                                 <TableRow key={index}>
                                                     {variables.map(header => (
-                                                        <TableCell align="center">{emp[header]}</TableCell>
+
+                                                        <TableItems header={header} emp={emp} />
+
                                                     ))}
                                                 </TableRow>
                                             ))}

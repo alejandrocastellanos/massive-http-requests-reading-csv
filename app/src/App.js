@@ -101,7 +101,7 @@ function App() {
         <>
             <ThemeProvider theme={darkTheme}>
                 <Box color={"text.primary"} sx={{
-                    backgroundImage: "url('http://localhost:3000/background.svg')",
+                    backgroundImage: "url('https://alejandrocastellanos.github.io/massive-http-requests-reading-csv/background.svg')",
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "150%",
                     position: "relative",
@@ -280,8 +280,6 @@ function App() {
                     </Grid>
                 </Box>
             </ThemeProvider>
-
-
         </>
     );
 }

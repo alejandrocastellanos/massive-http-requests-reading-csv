@@ -40,8 +40,7 @@ function App() {
                 header: true,
                 skipEmptyLines: true,
                 complete: function (results) {
-                    let data = results.data.map(v => Object.assign(v, {Result: 'pending'}))
-                    setData(data)
+                    setData(results.data)
                     setVariables(Object.keys(results.data[0]))
                 },
             });
@@ -73,9 +72,7 @@ function App() {
                 body: JSON.stringify(values)
             })
                 .then(response => {
-                    values['Result'] = 'sent';
-                    newData.push(values);
-                    setData(newData);
+                    console.log('response', response)
                 })
                 .catch(error => {
                     console.log('error: ', error);
